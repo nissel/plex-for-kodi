@@ -967,28 +967,12 @@ class SeekDialog(kodigui.BaseDialog, windowutils.GoHomeMixin, PlexSubtitleDownlo
                                 self.hideOSD()
                             return
 
-                        if action in (xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_STOP):
-                            if action != xbmcgui.ACTION_STOP and self._osdHideAnimationTimeout:
-                                if self._osdHideAnimationTimeout >= time.time():
-                                    return
-                                else:
-                                    self._osdHideAnimationTimeout = None
+                        if controlID == self.NO_OSD_BUTTON_ID:
+                            self.stop()
+                        elif self.osdVisible():
+                            self.hideOSD()
+                        return
 
-                            if action != xbmcgui.ACTION_STOP and self.osdVisible():
-                                if not self.playlistDialogVisible:
-                                    self.hideOSD()
-                            else:
-                                # were we in a credits marker that has been canceled? use its endTime for our timeline
-                                # event
-                                t = None
-                                if (self._currentMarker and self._currentMarker["marker_type"] == "credits" and
-                                        self._currentMarker["hidden"]):
-                                    util.DEBUG_LOG("Using credits marker's endtime for timeline event as it's been "
-                                                   "skipped and we're stopping playback")
-                                    t = self._currentMarker["marker"].endTimeOffset
-                                self.sendTimeline(state=self.player.STATE_STOPPED, t=t, ensureFinalTimelineEvent=True)
-                                self.stop()
-                            return
         except:
             util.ERROR()
 
